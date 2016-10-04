@@ -8,13 +8,22 @@ RUN apt-get update --fix-missing
 # Because aptitude is better, don't judge me
 RUN apt-get -y install --fix-missing aptitude apt-utils
 
+# To suppress annoying debconf errors.
+ENV DEBIAN_FRONTEND=noninteractive
+
 #######################################################
 # Be sure to add any packages the flakes need in here.
-RUN aptitude -y install wget
-RUN aptitude -y install curl
-RUN aptitude -y install git
-RUN aptitude -y install python-pip
-RUN aptitude -y install python3-pip
+ENV apt_list="wget \
+    curl \
+    git \
+    unzip \
+    python-pip \
+    python3-pip \
+    libssl-dev \
+    libffi-dev \
+    jq \
+    openssh-client"
+RUN bash -c 'for p in ${apt_list[@]}; do aptitude -y install $p; done'
 #######################################################
 
 #######################################################
@@ -27,9 +36,28 @@ RUN mkdir -p /etc/scripts
 
 #######################################################
 # Pip install block
+#ENV package_list="awscli \
+#    boto3 \
+#    boto \
+#    botocore \
+#    requests \
+#    HTMLParser \
+#    cffi \
+#    cryptography \
+#    docutils \
+#    enum34 \
+#    futures \
+#    idna \
+#    ipaddress \
+#    jmespath \
+#    pyasn1 \
+#    pycparser \
+#    python-dateutil \
+#    simplejson \
+#    six \
+#    sh"
 ENV package_list="awscli \
     boto3 \
-    boto \
     botocore \
     requests \
     HTMLParser \
@@ -41,16 +69,18 @@ ENV package_list="awscli \
     idna \
     ipaddress \
     jmespath \
+    paramiko \
     pyasn1 \
     pycparser \
+    pysftp \
     python-dateutil \
     simplejson \
     six \
     sh"
 RUN pip2 install --upgrade pip
-RUN for p in ${package_list[@]}; do pip2 install --upgrade $p; done
+RUN bash -c 'for p in ${package_list[@]}; do pip2 install --upgrade $p; done'
 RUN pip3 install --upgrade pip
-RUN for p in ${package_list[@]}; do pip3 install --upgrade $p; done
+RUN bash -c 'for p in ${package_list[@]}; do pip3 install --upgrade $p; done'
 #######################################################
 
 #######################################################
