@@ -1,0 +1,11 @@
+{
+  "flakeName": "example-job-no-alarms",
+  "flakeCronstring": "* * * * *",
+  "flakeCommand": "./res/test5/test5.sh",
+  "flakeCommand_comment": "This will store the command output in Cloudwatch Logs under SpecialSnowflake log group.",
+  "flakeType": "job",
+  "flakeUnit": "Count",
+  "flakeMetricNamespace": "test5/KPIs",
+  "flakeRegion": "us-east-1",
+  "flakeAlarms": []
+}

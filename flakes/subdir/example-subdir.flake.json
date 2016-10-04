@@ -1,0 +1,37 @@
+{
+  "flakeName": "example-subdir",
+  "flakeCronstring": "* * * * *",
+  "flakeCommand": "./res/test4/test4.sh",
+  "flakeType": "metric",
+  "flakeUnit": "Count",
+  "flakeMetricNamespace": "test4/KPIs",
+  "flakeRegion": "us-east-1",
+  "flakeAlarms": [
+    {
+      "alarmName": "TestHighThreshold",
+      "alarmDescription": "Alarm if the metric is too high",
+      "alarmThreshold": "5",
+      "alarmOperator": "GreaterThanThreshold",
+      "alarmPeriodLength": "60",
+      "alarmPeriods": "1",
+      "alarmStatistic": "Average",
+      "alarmEndpoints": {
+        "ok": "arn:aws:sns:us-east-1:257957048733:PagerDuty-IT-Only",
+        "alarm": "arn:aws:sns:us-east-1:257957048733:PagerDuty-IT-Only"
+      }
+    },
+    {
+      "alarmName": "TestLowThreshold",
+      "alarmDescription": "Alarm if the metric is too low",
+      "alarmThreshold": "4",
+      "alarmOperator": "LessThanThreshold",
+      "alarmPeriodLength": "60",
+      "alarmPeriods": "1",
+      "alarmStatistic": "Average",
+      "alarmEndpoints": {
+        "ok": "arn:aws:sns:us-east-1:257957048733:PagerDuty-IT-Only",
+        "alarm": "arn:aws:sns:us-east-1:257957048733:PagerDuty-IT-Only"
+      }
+    }
+  ]
+}

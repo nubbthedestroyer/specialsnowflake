@@ -1,0 +1,38 @@
+{
+  "flakeName": "example-job",
+  "flakeCronstring": "* * * * *",
+  "flakeCommand": "./res/test3/test3.sh",
+  "flakeCommand_comment": "The flake command must return an integer only to submit metrics.  If it returns text it will just log it.",
+  "flakeType": "job",
+  "flakeUnit": "Count",
+  "flakeMetricNamespace": "test2/KPIs",
+  "flakeRegion": "us-east-1",
+  "flakeAlarms": [
+    {
+      "alarmName": "TestHighThreshold",
+      "alarmDescription": "Alarm if the metric is too high",
+      "alarmThreshold": "5",
+      "alarmOperator": "GreaterThanThreshold",
+      "alarmPeriodLength": "60",
+      "alarmPeriods": "1",
+      "alarmStatistic": "Average",
+      "alarmEndpoints": {
+        "ok": "arn:aws:sns:us-east-1:257957048733:PagerDuty-IT-Only",
+        "alarm": "arn:aws:sns:us-east-1:257957048733:PagerDuty-IT-Only"
+      }
+    },
+    {
+      "alarmName": "TestLowThreshold",
+      "alarmDescription": "Alarm if the metric is too low",
+      "alarmThreshold": "1",
+      "alarmOperator": "LessThanThreshold",
+      "alarmPeriodLength": "60",
+      "alarmPeriods": "1",
+      "alarmStatistic": "Average",
+      "alarmEndpoints": {
+        "ok": "arn:aws:sns:us-east-1:257957048733:PagerDuty-IT-Only",
+        "alarm": "arn:aws:sns:us-east-1:257957048733:PagerDuty-IT-Only"
+      }
+    }
+  ]
+}
