@@ -2,14 +2,10 @@
 ###### A cloudwatch ingester for custom metrics
 ###### "Hey baby, do you need monitoring?  Because I could hit your endpoint all day long!"
 
-
 #### Intro 
-
-> This script grabs metrics with a bash command that you specify and uploads it with the parameters you specify into Cloudwatch.  Also creates and manages alarms defined in each flake file.  Requires AWS credentials or IAM Role to run.
-
+> This script grabs metrics with a bash command that you specify and uploads it with the parameters you specify into Cloudwatch.  Also creates and manages alarms defined in each flake file.  Requires AWS credentials or IAM Role to run.  SpecialSnowflake is a very useful tool for advanced custom monitoring of various disparate metrics and can be used to monitor anything from the output of a SQL query to a grep and line count of a log file on a remote server.  It's designed to be flexible and can support any linux tool to generate metric data, but also support integration with nearly any external application like PagerDuty or Slack by using SNS endpoints on alarms. It can be run inside of the docker container or natively outside of it if the dependencies are available.
 
 #### Requirements
-
 > * AWS Credentials with Cloudwatch R/W access
 >   * also configured under the linux account that will be running the script OR at the AWS Instance Role level.
 > * See the Dockerfile for a list of required packages, add any you need for the flakes.
@@ -17,15 +13,12 @@
 >   * Dockerfile and standard docker environment installs this by default.
 > * There is a docker file and related scripts included in this repo that you can use to test a flake.  Run this command to start a test.
 >   * ```./test-a-flake.sh <your-flake-name>```
->     * This will pull in credentials from infra/scipts/credentials (requires awscli and appropriate permissions), build the docker, and run any flake(s) that match(es) the string you pass to the shell script.  
+>     * This will pull in credentials from infra/scipts/credentials, build the docker, and run any flake(s) that match(es) the string you pass to the shell script.  
 
 #### Operation
-
 > The script loops through each file in the flakes directory, sourcing the variables within.  Then runs the flakeCommand string and puts the output of the command into Cloudwatch using the configuration you specify in the flake file.  It will also log errors into individual log files for each flake based on the flakeName which can then be ingested by any log retention system like logstash.
 
-
 #### Tips
-
 > * Ensure that the command run in the flakeCommand variable returns naked data and does not include quotes or warnings.  Should only be a single integer or float.
 >   * That being said, you can use the shell file that the flakeCommand points to for advanced calculations and ratios between multiple query return values, including external scripts like php.
 > * You cannot make notes in the json files, but you can add fields (like '_comment1', '_comment2', etc) and use those to store comments or important info.
@@ -36,14 +29,13 @@
 >   * Write your flake file and associated external scripts and place them in appropriate folders relevant to the task.
 >   * run this command
 >   * ```./test-a-flake.sh <name-of-flake>```
->     * If you exclude your flake name it will just run an example flake.  Run multiple flakes by including matching text.  So to run all flakes that begin with "zq-" put "zq-" for name of flake.
+>     * If you exclude your flake name it will just run an example flake.  Run multiple flakes by including matching text.  So to run all flakes that begin with "zq-" put "zq-" for name-of-flake.
 >   * This will build the container, install dependencies, and put everything where it needs to be.  Fortunately, it does this with the exact same architecture and environment as it would in production, so you get a pretty good test for your flake as it would run in prod.
 >     * Might take a while the first time as the docker container has to build.
 >     * This will post real data and real alarms to AWS.  Be prepared for alerts if your threshold is breached and you've defined Cloudwatch Alarms.
 >   * If you get an HTTP 200 from Cloudwatch then your flake should be good.
 
 #### Default config
-
 > See the below default config file at flakes/example-perminute.flake.json for an example of a full configuration.
 > 
     {
@@ -84,14 +76,13 @@
       ]
     }
 
-> See the below example of a resource file for the script to collect the metric.
+> See the below example of a resource file for the script to collect the metric, what could be "./res/test3/test3.sh".
 > It is very important that this script return only a number and no errors or other characters or formatting.
 
     #!/usr/bin/env bash
     mysql -Ns -h mysqlhost.example.com -u${user1} -p${pass1} -e "SHOW STATUS;" 2>&1 | grep -v 'Warning' | grep Uptime | sed 's/[^0-9]*//g'  | head -n 1
 
 #### Flake file reference
-
 > * flakeName
 >   * Name of the flake, must be unique.
 > * flakeConstring
@@ -104,7 +95,7 @@
 >   * See Cloudwatch documentation for the different types of Units.  Count is usually fine.
 >   * http://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/cloudwatch_concepts.html#Unit
 > * flakeMetricNamespace
->   * Another Cloudwatch specific field.  Allows you to create custom categories for gathers metrics.
+>   * Another Cloudwatch specific field.  Allows you to create custom categories for gathering metrics.
 >   * http://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/cloudwatch_concepts.html#Namespace
 > * flakeRegion
 >   * AWS region for Cloudwatch reporting.
@@ -136,6 +127,5 @@
 >       * http://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/US_SetupSNS.html
 
 #### Future Improvements
-
 > * I would like to eventually get all the flakes to reference Dockerfiles to run instead of native scripts.  As flakes are added each more and more packages and dependencies will be added to the environment, which I think will cause problems at scale.  This can be achieved via Docker D-in-D, but we would need to translate this to an ECS cluster I think for load balancing.
 > * There is a small memory leak somewhere in the storm.py threading loop that I can't pinpoint.  Might be the way I'm threading.  I expect python to know to garbage collect after each cycle finishes, but maybe it's not.
